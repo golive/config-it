@@ -2,13 +2,14 @@ require 'coercible'
 
 class ConfigIt::AttributeValue
 
-  def initialize(value, type = nil)
-    @type = type
-    @value = coerced_value(type, value)
+  def initialize(value, options = {})
+    @type = options[:type]
+    @default_value = options[:default]
+    @value = coerced_value(@type, value)
   end
 
   def value
-    @value
+    @value || @default_value
   end
 
   def value=(value)
@@ -23,7 +24,7 @@ private
 
   def coerced_value(type, value)
     type = type && {'boolean' => :boolean, 'date' => :date, 'datetime' => :datetime, 'float' => :float, 'integer' => :integer}[type.to_s]
-    if type
+    if type && value
       Coercible::Coercer.new[value.class].send("to_#{type}", value)
     else
       value

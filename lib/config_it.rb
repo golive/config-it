@@ -17,7 +17,7 @@ class ConfigIt
     @attributes = {}
 
     self.class.attribute_names.each do |name, options|
-      initialize_attribute(name, attrs[name.to_s] || attrs[name] || options[:default], options[:type])
+      initialize_attribute(name, attrs[name.to_s] || attrs[name] || options[:default], options)
     end
 
     self.class.attribute_groups.each do |name, options|
@@ -38,8 +38,8 @@ class ConfigIt
     end
   end
 
-  def initialize_attribute(name, value, type = nil)
-    attr_value = instance_variable_set("@#{name}", ConfigIt::AttributeValue.new(value, type))
+  def initialize_attribute(name, value, options)
+    attr_value = instance_variable_set("@#{name}", ConfigIt::AttributeValue.new(value, options))
     @attributes[name.to_sym] ||= attr_value
   end
 

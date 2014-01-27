@@ -45,6 +45,11 @@ describe ConfigIt, '#attribute' do
       subject.attr2.should == 4
     end
 
+    it 'reverts to default value if null value' do
+      subject.attr2 = nil
+      subject.attr2.should == 3
+    end
+
     after(:all) { Object.send(:remove_const, :Test) }
   end
 
@@ -67,5 +72,20 @@ describe ConfigIt, '#attribute' do
       config2.attr1.should == 2
     end
 
+  end
+
+  context 'coercion' do
+    before :all do
+      class Test < ConfigIt
+        attribute :attr1, type: :integer
+      end
+    end
+
+    subject { Test.new }
+
+    it 'coerces values' do
+      subject.attr1 = "1"
+      subject.attr1.should == 1
+    end
   end
 end

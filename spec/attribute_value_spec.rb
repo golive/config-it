@@ -14,38 +14,43 @@ describe ConfigIt::AttributeValue do
   end
 
   context 'coerce values' do
-    it 'not coerces non string value' do
-      av = ConfigIt::AttributeValue.new(1, :date)
+    it 'not coerces non incompatible value' do
+      av = ConfigIt::AttributeValue.new(1, type: :date)
       av.value.should == 1
+    end
+
+    it "doesn't coerce nil value" do
+      av = ConfigIt::AttributeValue.new(nil, type: :date)
+      av.value.should be_nil
     end
 
     it 'coerces to boolean' do
       [1, "1", "yes"].each do |v|
-        av = ConfigIt::AttributeValue.new(v, :boolean)
+        av = ConfigIt::AttributeValue.new(v, type: :boolean)
         av.value.should be_true
       end
       [0, "0", "no"].each do |v|
-        av = ConfigIt::AttributeValue.new(0, :boolean)
+        av = ConfigIt::AttributeValue.new(0, type: :boolean)
         av.value.should be_false
       end
     end
 
     it 'coerces to float' do
       [1, "1", 1.0].each do |v|
-        av = ConfigIt::AttributeValue.new(v, :float)
+        av = ConfigIt::AttributeValue.new(v, type: :float)
         av.value.should == 1.0
       end
     end
 
     it 'coerces to integer' do
       [1, "1", 1.0].each do |v|
-        av = ConfigIt::AttributeValue.new(v, :float)
+        av = ConfigIt::AttributeValue.new(v, type: :float)
         av.value.should == 1
       end
     end
 
     it 'coerces upon assingation' do
-      av = ConfigIt::AttributeValue.new(1, :boolean)
+      av = ConfigIt::AttributeValue.new(1, type: :boolean)
       av.value = 0
       av.value.should be_false
     end
