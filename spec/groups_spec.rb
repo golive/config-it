@@ -1,46 +1,122 @@
 require 'spec_helper'
 
-describe ConfigIt, '#group' do
+describe ConfigIt do
 
-  before :all do
+  context '#group' do
+    before :all do
 
-    class Parent < ConfigIt
-      attribute :attr1
-      group :child
+      class Parent < ConfigIt
+        attribute :attr1
+        group :child
+      end
+
+      class Parent::Child < ConfigIt
+        attribute :attr2
+        attribute :attr3, default: 2
+      end
+
     end
 
-    class Parent::Child < ConfigIt
-      attribute :attr2
-      attribute :attr3, default: 2
+    subject { Parent.new }
+
+    it 'responds to group attribute' do
+      should respond_to :child
     end
 
+    it 'returns a object of group' do
+      subject.child.should be_kind_of Parent::Child
+    end
+
+    it 'navigates to nested attributes' do
+      subject.child.should respond_to :attr2
+    end
+
+    it 'sets nested attibutes' do
+      subject.child.attr2 = 1
+      subject.child.attr2.should == 1
+    end
+
+    it 'returns default nested attribute values' do
+      subject.child.attr3.should == 2
+    end
+
+    after(:all) do
+      Parent.send(:remove_const, :Child)
+      Object.send(:remove_const, :Parent)
+    end
   end
 
-  subject { Parent.new }
+  context 'multilevel' do
 
-  it 'responds to group attribute' do
-    should respond_to :child
+    before :all do
+
+      class Parent < ConfigIt
+        group :child
+      end
+
+      class Parent::Child < ConfigIt
+        group :grand_child
+      end
+
+      class Parent::Child::GrandChild < ConfigIt
+        attribute :attr3, default: 1
+      end
+    end
+
+    it 'get the class if _ present' do
+      expect { Parent.new }.to_not raise_exception
+    end
+
+    it 'navigates to last level' do
+
+    end
+
+    after(:all) do
+      Parent::Child.send(:remove_const, :GrandChild)
+      Parent.send(:remove_const, :Child)
+      Object.send(:remove_const, :Parent)
+    end
   end
 
-  it 'returns a object of group' do
-    subject.child.should be_kind_of Parent::Child
-  end
+  context '#group with specific class' do
+    before :all do
 
-  it 'navigates to nested attributes' do
-    subject.child.should respond_to :attr2
-  end
+      class Parent < ConfigIt
+        attribute :attr1
+        group :child, class_name: "Child"
+      end
 
-  it 'sets nested attibutes' do
-    subject.child.attr2 = 1
-    subject.child.attr2.should == 1
-  end
+      class Child < ConfigIt
+        attribute :attr2
+        attribute :attr3, default: 2
+      end
 
-  it 'returns default nested attribute values' do
-    subject.child.attr3.should == 2
-  end
+      class Parent2 < ConfigIt
+        group :child2
+      end
 
-  after(:all) do
-    Parent.send(:remove_const, :Child)
-    Object.send(:remove_const, :Parent)
+      class Parent3 < ConfigIt
+        group :child3, class_name: "Child3"
+      end
+    end
+
+    subject { Parent.new }
+
+    it 'returns a object of group' do
+      subject.child.should be_kind_of Child
+    end
+
+    it "raises exception if group class doesn't exist" do
+      expect { Parent2.new }.to raise_exception(ConfigIt::ConfigError, /Child2/)
+    end
+
+    it "raises exception if group class doesn't exist with specific class" do
+      expect { Parent3.new }.to raise_exception(ConfigIt::ConfigError, /Child3/)
+    end
+
+    after(:all) do
+      Object.send(:remove_const, :Parent)
+      Object.send(:remove_const, :Child)
+    end
   end
 end
