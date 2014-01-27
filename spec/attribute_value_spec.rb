@@ -13,6 +13,19 @@ describe ConfigIt::AttributeValue do
     av.value.should == 'copy_value'
   end
 
+  context 'default values' do
+    it 'stores default values' do
+      av = ConfigIt::AttributeValue.new(nil, default: 1)
+      av.value.should == 1
+    end
+
+    it 'reverts to default value if null value' do
+      av = ConfigIt::AttributeValue.new(1, default: 2)
+      av.value = nil
+      av.value.should == 2
+    end
+  end
+
   context 'coerce values' do
     it 'not coerces non incompatible value' do
       av = ConfigIt::AttributeValue.new(1, type: :date)
