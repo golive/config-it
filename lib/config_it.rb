@@ -2,8 +2,10 @@ require "config_it/version"
 require "config_it/attribute_value"
 require "config_it/errors"
 require "config_it/string"
+require 'active_model'
 
 class ConfigIt
+  include ActiveModel::Validations
 
   def self.attribute_names
     @attribute_names ||= {}
@@ -65,6 +67,20 @@ class ConfigIt
     @attributes.inject({}) do |hash, (attr, value)|
       hash[attr] = value.to_hash
       hash
+    end
+  end
+
+  def group_attributes
+    self.class.attribute_groups.collect { |name, value| @attributes[name] }
+  end
+
+  def valid?(context = nil)
+    if context && self.class.attribute_groups[context.to_sym]
+      @attributes[context.to_sym].valid?
+    elsif context && self.class.attribute_names[context.to_sym]
+      super(context)
+    else
+      super && group_attributes.all?(&:valid?)
     end
   end
 

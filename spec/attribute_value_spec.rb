@@ -38,12 +38,12 @@ describe ConfigIt::AttributeValue do
     end
 
     it 'coerces to boolean' do
-      [1, "1", "yes"].each do |v|
+      [1, "1", "yes", "true"].each do |v|
         av = ConfigIt::AttributeValue.new(v, type: :boolean)
         av.value.should be_true
       end
-      [0, "0", "no"].each do |v|
-        av = ConfigIt::AttributeValue.new(0, type: :boolean)
+      [0, "0", "no", "false"].each do |v|
+        av = ConfigIt::AttributeValue.new(v, type: :boolean)
         av.value.should be_false
       end
     end
