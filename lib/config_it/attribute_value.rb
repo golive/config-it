@@ -24,12 +24,19 @@ module ConfigIt
   private
 
     def coerced_value(type, value)
-      type = type && {'boolean' => :boolean, 'date' => :date, 'datetime' => :datetime, 'float' => :float, 'integer' => :integer}[type.to_s]
-      if type && value
-        Coercible::Coercer.new[value.class].send("to_#{type}", value)
+      if type && [:boolean, :date, :datetime, :float, :integer].include?(type.to_sym) && value
+        if value.is_a?(Array)
+          value.map{ |v| safe_coercion(type, v) }
+        else
+          safe_coercion(type, value)
+        end
       else
         value
       end
+    end
+
+    def safe_coercion(type, value)
+      Coercible::Coercer.new[value.class].send("to_#{type}", value)
     end
   end
 end

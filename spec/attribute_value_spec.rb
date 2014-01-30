@@ -67,6 +67,11 @@ describe ConfigIt::AttributeValue do
       av.value = 0
       av.value.should be_false
     end
+
+    it 'coerces each value of an array' do
+      av = ConfigIt::AttributeValue.new(["1", "2", 3], type: :integer)
+      av.value.should == [1,2,3]
+    end
   end
 
 end
