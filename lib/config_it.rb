@@ -70,17 +70,11 @@ class ConfigIt
     end
   end
 
-  def group_attributes
-    self.class.attribute_groups.collect { |name, value| @attributes[name] }
-  end
+  alias_method :old_valid?, :valid?
 
   def valid?(context = nil)
-    if context && self.class.attribute_groups[context.to_sym]
-      @attributes[context.to_sym].valid?
-    elsif context && self.class.attribute_names[context.to_sym]
-      super(context)
-    else
-      super && group_attributes.all?(&:valid?)
+    old_valid?(context) & self.class.attribute_groups.inject(true) do |valid, (group_name, options)|
+      valid &= (@attributes[group_name].valid?(context) || !self.errors.add(group_name, :invalid))
     end
   end
 

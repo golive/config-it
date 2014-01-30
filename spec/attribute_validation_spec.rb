@@ -62,25 +62,15 @@ describe ConfigIt do
 
     subject { Parent.new }
 
-    it 'should not be valid' do
+    it 'should not be valid', :wip => true do
       subject.should_not be_valid
     end
 
-    it 'validates with attribute context' do
-      subject.should be_valid(:attr1)
+    pending 'validates with attribute context' do
     end
 
-    it 'validates if inexistent context' do
-      subject.child.attr2 = 1
-      subject.should be_valid(:attr2)
-    end
 
-    it 'valdates with group context' do
-      Parent.validates_presence_of :attr1
-      subject.child.attr2 = 1
-      subject.should_not be_valid
-      subject.should be_valid(:child)
-      subject.should_not be_valid(:attr1)
+    pending 'validates with group context' do
     end
 
     after(:all) do
@@ -88,4 +78,42 @@ describe ConfigIt do
       Object.send(:remove_const, :Parent)
     end
   end
+
+  context 'errors' do
+    before :all do
+      class Parent < ConfigIt
+        attribute :attr1
+        group :child
+      end
+
+      class Parent::Child < ConfigIt
+        attribute :attr2
+        validates_presence_of :attr2
+      end
+
+      class Parent::Child2 < ConfigIt
+        attribute :attr3
+        validates_presence_of :attr3
+      end
+    end
+
+    subject { Parent.new }
+
+    it 'has errors on group attribute' do
+      subject.should have(1).errors_on(:child)
+    end
+
+    it 'has errors on multiple group attributes' do
+      Parent.group :child2
+      subject.should have(1).errors_on(:child)
+      subject.should have(1).errors_on(:child2)
+    end
+
+    after(:all) do
+      Parent.send(:remove_const, :Child)
+      Parent.send(:remove_const, :Child2)
+      Object.send(:remove_const, :Parent)
+    end
+  end
+
 end
