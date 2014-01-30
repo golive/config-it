@@ -5,7 +5,8 @@ describe ConfigIt, '#to_hash' do
   context 'simple attribute' do
     before :all do
 
-      class Test < ConfigIt
+      class Test
+        include ConfigIt
         attribute :attr1
       end
 
@@ -27,7 +28,8 @@ describe ConfigIt, '#to_hash' do
   context 'default values' do
     before :all do
 
-      class Test < ConfigIt
+      class Test
+        include ConfigIt
         attribute :attr1, default: 1
       end
 
@@ -45,7 +47,8 @@ describe ConfigIt, '#to_hash' do
   context 'changed values' do
     before :all do
 
-      class Test < ConfigIt
+      class Test
+        include ConfigIt
         attribute :attr1, default: 1
       end
 
@@ -64,12 +67,14 @@ describe ConfigIt, '#to_hash' do
   context 'group' do
     before :all do
 
-      class Parent < ConfigIt
+      class Parent
+        include ConfigIt
         attribute :attr1
         group :child
       end
 
-      class Parent::Child < ConfigIt
+      class Parent::Child
+        include ConfigIt
         attribute :attr2
         attribute :attr3, default: 2
       end

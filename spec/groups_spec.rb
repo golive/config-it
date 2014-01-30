@@ -5,12 +5,14 @@ describe ConfigIt do
   context '#group' do
     before :all do
 
-      class Parent < ConfigIt
+      class Parent
+        include ConfigIt
         attribute :attr1
         group :child
       end
 
-      class Parent::Child < ConfigIt
+      class Parent::Child
+        include ConfigIt
         attribute :attr2
         attribute :attr3, default: 2
       end
@@ -40,9 +42,20 @@ describe ConfigIt do
       subject.child.attr3.should == 2
     end
 
+    it 'allows to override group configuration' do
+      class Test
+        include ConfigIt
+        attribute :attr2
+      end
+
+      Parent.group :child, class_name: "Test"
+      Parent.new.child.should be_kind_of Test
+    end
+
     after(:all) do
       Parent.send(:remove_const, :Child)
       Object.send(:remove_const, :Parent)
+      Object.send(:remove_const, :Test)
     end
   end
 
@@ -50,15 +63,18 @@ describe ConfigIt do
 
     before :all do
 
-      class Parent < ConfigIt
+      class Parent
+        include ConfigIt
         group :child
       end
 
-      class Parent::Child < ConfigIt
+      class Parent::Child
+        include ConfigIt
         group :grand_child
       end
 
-      class Parent::Child::GrandChild < ConfigIt
+      class Parent::Child::GrandChild
+        include ConfigIt
         attribute :attr3, default: 1
       end
     end
@@ -81,21 +97,25 @@ describe ConfigIt do
   context '#group with specific class' do
     before :all do
 
-      class Parent < ConfigIt
+      class Parent
+        include ConfigIt
         attribute :attr1
         group :child, class_name: "Child"
       end
 
-      class Child < ConfigIt
+      class Child
+        include ConfigIt
         attribute :attr2
         attribute :attr3, default: 2
       end
 
-      class Parent2 < ConfigIt
+      class Parent2
+        include ConfigIt
         group :child2
       end
 
-      class Parent3 < ConfigIt
+      class Parent3
+        include ConfigIt
         group :child3, class_name: "Child3"
       end
     end

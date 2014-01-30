@@ -5,7 +5,8 @@ describe ConfigIt do
   context 'no groups' do
     before :all do
 
-      class Test < ConfigIt
+      class Test
+        include ConfigIt
         attribute :attr1
         attribute :attr2, default: 2
         attribute :attr3
@@ -54,12 +55,14 @@ describe ConfigIt do
   context 'with groups' do
     before :all do
 
-      class Parent < ConfigIt
+      class Parent
+        include ConfigIt
         attribute :attr1
         group :child
       end
 
-      class Parent::Child < ConfigIt
+      class Parent::Child
+        include ConfigIt
         attribute :attr2, default: 2
         attribute :attr3
         attribute :attr4, default: 4
@@ -96,17 +99,20 @@ describe ConfigIt do
   context 'multilevel' do
     before :all do
 
-      class Parent < ConfigIt
+      class Parent
+        include ConfigIt
         attribute :attr1
         group :child
       end
 
-      class Parent::Child < ConfigIt
+      class Parent::Child
+        include ConfigIt
         attribute :attr2
         group :grand_child
       end
 
-      class Parent::Child::GrandChild < ConfigIt
+      class Parent::Child::GrandChild
+        include ConfigIt
         attribute :attr3
       end
     end

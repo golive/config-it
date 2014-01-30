@@ -1,1 +1,3 @@
-class ConfigIt::ConfigError < StandardError; end
+module ConfigIt
+  class ConfigError < StandardError; end
+end

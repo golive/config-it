@@ -4,7 +4,9 @@ describe ConfigIt, '#attribute' do
 
   context 'one config' do
     before :all do
-      class Test < ConfigIt
+      class Test
+        include ConfigIt
+
         attribute :attr1
         attribute :attr2, default: 3
       end
@@ -50,16 +52,23 @@ describe ConfigIt, '#attribute' do
       subject.attr2.should == 3
     end
 
+    it 'allows to override attribute config' do
+      Test.attribute :attr1, default: 1
+      Test.new.attr1.should == 1
+    end
+
     after(:all) { Object.send(:remove_const, :Test) }
   end
 
   context 'two configs' do
     before :all do
-      class C1 < ConfigIt
+      class C1
+        include ConfigIt
         attribute :attr1, default: 1
       end
 
-      class C2 < ConfigIt
+      class C2
+        include ConfigIt
         attribute :attr1, default: 2
       end
     end
@@ -76,7 +85,8 @@ describe ConfigIt, '#attribute' do
 
   context 'coercion' do
     before :all do
-      class Test < ConfigIt
+      class Test
+        include ConfigIt
         attribute :attr1, type: :integer
       end
     end
