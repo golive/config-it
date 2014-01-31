@@ -1,7 +1,6 @@
 require 'config_it/version'
 require 'config_it/attribute_value'
 require 'config_it/errors'
-require 'config_it/string'
 require 'active_model'
 
 
@@ -64,7 +63,7 @@ module ConfigIt
     end
 
     def initialize_group(name, values, options)
-      class_name = options[:class_name] || name.to_s.classify
+      class_name = options[:class_name] || name.to_s.split(/_/).map(&:capitalize).join
       klass = options[:class_name] && Object.module_eval("::#{class_name}") || self.class.const_get(class_name)
       attribute_group = klass.new(values)
       instance_variable_set("@#{name}", attribute_group)
